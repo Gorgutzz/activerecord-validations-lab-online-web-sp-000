@@ -2,17 +2,13 @@ class Post < ActiveRecord::Base
   validates :title, presence: true
   validates :content, length:{minimum: 250}
   validates :summary, length:{maximum: 250}
-  validates :category, inclusion: {in: %w(Fiction Non-fiction)}
-  validate :click_baity
+  validates :category, inclusion: { in: %w(Fiction Non-Fiction) }
+  validate :name_must_be_clickbaity, unless: Proc.new { |a| a.title.blank? }
 
-  Click_bait = [/Won't Believe/i,
-  /Secret/i,
-  /Top [0-9]*/i,
-  /Guess/i]
-
-  def click_baity
-      if Click_bait.none? {|p| p.match title}
-          errors.add(:title, "Not Click-Bait")
+  def name_must_be_clickbaity
+      if ((!self.title.include?("Won't Believe")) && (!self.title.include?("Secret")) && (!self.title.include?("Guess")) && !(self.title =~ /^Top \d*/))
+          errors.add(:title, "Title must be clickbaity")
       end
+  end
   end
 end
